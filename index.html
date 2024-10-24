@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Counting Lesson</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        #logo {
+            margin: 20px 0;
+        }
+        .money {
+            width: 100px;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        .money:hover {
+            transform: scale(1.1);
+        }
+        #money-box {
+            border: 2px dashed #007BFF;
+            padding: 20px;
+            width: 250px;
+            margin: 20px auto;
+            min-height: 100px;
+            position: relative;
+        }
+        .result {
+            font-size: 20px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        #target-amount {
+            font-size: 24px;
+            color: #007BFF;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        #more-lessons {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        #options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .highlight {
+            background-color: lightgreen;
+        }
+        .highlight-incorrect {
+            background-color: lightcoral;
+        }
+        .congratulations {
+            color: blue;
+            font-size: 22px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <img id="logo" src="https://i.imgur.com/mwpTHJj.png" alt="Logo" />
+    <h1>Money Counting (Kenyan Coins and Notes)</h1>
+    <p>Drag the coins and notes into the box to count the total money!</p>
+
+    <div id="target-amount"></div>
+    
+    <div id="money-box">Drop coins/notes here</div>
+    
+    <div id="options">
+        <img class="money" src="https://i.imgur.com/q5z9qOu.png" value="1000" alt="1000 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/JMrOLry.png" value="500" alt="500 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/cWspD5K.png" value="200" alt="200 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/C7eHZtR.png" value="100" alt="100 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/Lv62Dom.png" value="50" alt="50 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/ILKRjEb.png" value="20" alt="20 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/fCZsYr7.png" value="10" alt="10 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/56DijzU.png" value="5" alt="5 KSh" draggable="true">
+        <img class="money" src="https://i.imgur.com/S5f4qe7.png" value="1" alt="1 KSh" draggable="true">
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="congratulations" id="congratulations"></div>
+    <a id="more-lessons" href="https://sites.google.com/view/grades-2/home">More Lessons</a>
+
+    <script>
+        const moneyImages = document.querySelectorAll('.money');
+        const moneyBox = document.getElementById('money-box');
+        const resultDiv = document.getElementById('result');
+        const targetAmountDiv = document.getElementById('target-amount');
+        const congratulationsDiv = document.getElementById('congratulations');
+        let totalMoney = 0;
+        let targetAmount = 0; // Initialize target amount variable
+
+        moneyImages.forEach(money => {
+            money.addEventListener('dragstart', dragStart);
+        });
+
+        moneyBox.addEventListener('dragover', dragOver);
+        moneyBox.addEventListener('drop', drop);
+
+        function dragStart(event) {
+            event.dataTransfer.setData('text/plain', event.target.getAttribute('value'));
+            event.dataTransfer.setData('text/html', event.target.outerHTML);
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const value = event.dataTransfer.getData('text/plain');
+            const html = event.dataTransfer.getData('text/html');
+            totalMoney += parseInt(value);
+
+            const moneyDiv = document.createElement('div');
+            moneyDiv.innerHTML = html; // Use the HTML of the dragged item
+            moneyBox.appendChild(moneyDiv);
+
+            updateResult();
+        }
+
+        function generateNewTargetAmount() {
+            // Generate a random amount for the learner to achieve
+            targetAmount = Math.floor(Math.random() * 2500) + 100; // Random amount between 100 and 2500
+            targetAmountDiv.innerHTML = `Total Required: KSh ${targetAmount}`; // Display the target amount
+            totalMoney = 0; // Reset total money for new attempt
+            moneyBox.innerHTML = 'Drop coins/notes here'; // Clear money box
+            resultDiv.innerHTML = ''; // Clear previous results
+            congratulationsDiv.innerHTML = ''; // Clear previous congratulations message
+        }
+
+        function updateResult() {
+            resultDiv.innerHTML = `Total Money: KSh ${totalMoney}`;
+            if (totalMoney === targetAmount) {
+                resultDiv.style.color = 'darkgreen';
+                congratulationsDiv.innerHTML = `Congratulations! You counted KSh ${totalMoney} correctly!`;
+                setTimeout(generateNewTargetAmount, 2000); // Wait 2 seconds and generate new target amount
+            } else if (totalMoney > targetAmount) {
+                resultDiv.style.color = 'darkred';
+                resultDiv.innerHTML = `Try again! Total Money: KSh ${totalMoney}. Aim for: KSh ${targetAmount}`;
+                // Reset total money for another attempt
+                totalMoney = 0;
+                moneyBox.innerHTML = 'Drop coins/notes here'; // Clear money box
+            }
+        }
+
+        // Initialize the first target amount
+        generateNewTargetAmount();
+    </script>
+</body>
+</html>
